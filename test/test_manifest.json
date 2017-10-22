@@ -489,6 +489,13 @@
        "link": false,
        "type": "eq"
     },
+    {  "id": "issue7769",
+       "file": "pdfs/issue7769.pdf",
+       "md5": "814f167b8437eb8e4e4b6e89743011d5",
+       "rounds": 1,
+       "link": false,
+       "type": "eq"
+    },
     {  "id": "issue5044",
        "file": "pdfs/issue5044.pdf",
        "md5": "44788cd31dcb4a2495ded34a84c4a765",
@@ -1639,6 +1646,22 @@
        "link": true,
        "lastPage": 1,
        "type": "load"
+    },
+    {  "id": "issue8702-eq",
+       "file": "pdfs/issue8702.pdf",
+       "md5": "59d501ed1518d78ef6ee442cf824b0f6",
+       "rounds": 1,
+       "link": false,
+       "lastPage": 1,
+       "type": "eq"
+    },
+    {  "id": "issue8702-text",
+       "file": "pdfs/issue8702.pdf",
+       "md5": "59d501ed1518d78ef6ee442cf824b0f6",
+       "rounds": 1,
+       "link": false,
+       "lastPage": 1,
+       "type": "text"
     },
     {  "id": "pr4897",
        "file": "pdfs/pr4897.pdf",
