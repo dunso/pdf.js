@@ -35,7 +35,9 @@
     "webpack": "^3.6.0",
     "webpack-stream": "^4.0.0",
     "wintersmith": "^2.4.1",
-    "yargs": "^9.0.1"
+    "yargs": "^9.0.1",
+    "canvas": "^1.6.7",
+    "pdfjs-dist": "^2.0.159"
   },
   "scripts": {
     "test": "gulp lint unittestcli externaltest"

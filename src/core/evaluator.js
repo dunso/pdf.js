@@ -32,15 +32,16 @@ import {
   WinAnsiEncoding, ZapfDingbatsEncoding
 } from './encodings';
 import {
+  getNonStdFontMap, getSerifFonts, getStdFontMap, getSymbolsFonts
+} from './standard_fonts';
+import {
   getNormalizedUnicodes, getUnicodeForGlyph, reverseIfRtl
 } from './unicode';
-import {
-  getSerifFonts, getStdFontMap, getSymbolsFonts
-} from './standard_fonts';
 import { getTilingPatternIR, Pattern } from './pattern';
 import { Lexer, Parser } from './parser';
 import { bidi } from './bidi';
 import { ColorSpace } from './colorspace';
+import { CustomEvaluatorPreprocessor } from './evaluator-preprocessor';
 import { getGlyphsUnicode } from './glyphlist';
 import { getMetrics } from './metrics';
 import { isPDFFunction } from './function';
@@ -1275,7 +1276,9 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       var xobjs = null;
       var skipEmptyXObjs = Object.create(null);
 
-      var preprocessor = new EvaluatorPreprocessor(stream, xref, stateManager);
+      var preprocessor =
+        // new EvaluatorPreprocessor(stream, xref, stateManager);
+        new CustomEvaluatorPreprocessor(stream, xref, stateManager, resources);
 
       var textState;
 
@@ -1350,6 +1353,35 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           textContentItem.textRunBreakAllowed = false;
         }
 
+        // ********************************************
+        // start set bold, italic, black, color, pageId
+        if (font.name) {
+          var fontName = font.name.replace(/[,_]/g, '-');
+          var stdFontMap = getStdFontMap(),
+            nonStdFontMap = getNonStdFontMap();
+          fontName = stdFontMap[fontName] ||
+            nonStdFontMap[fontName] || fontName;
+          textContentItem.bold = fontName.search(/bold/gi) !== -1;
+          textContentItem.italic = fontName.search(/oblique/gi) !== -1 ||
+            fontName.search(/italic/gi) !== -1 ||
+            Math.abs(trm[2] - 0.3333) < 0.1;
+          textContentItem.black = font.name.search(/Black/g) !== -1;
+        }
+        textContentItem.bold = textContentItem.bold ||
+          stateManager.state.textRenderingMode ===
+          TextRenderingMode.FILL_STROKE;
+
+        textContentItem.color = stateManager.state.fillColor;
+        textContentItem.fontOriginName = font.name;
+
+        var pageId = task.name && task.name.length > 1 &&
+          task.name.substring(task.name.length - 2);
+
+        if (pageId) {
+          textContentItem.pageId = pageId.trim();
+        }
+        // end set bold, italic, black, color, pageId
+        // ******************************************
 
         textContentItem.initialized = true;
         return textContentItem;
@@ -1377,6 +1409,12 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           height: textChunk.height,
           transform: textChunk.transform,
           fontName: textChunk.fontName,
+          bold: textChunk.bold,
+          italic: textChunk.italic,
+          black: textChunk.black,
+          color: textChunk.color,
+          fontOriginName: textChunk.fontOriginName,
+          pageId: textChunk.pageId,
         };
       }
 
